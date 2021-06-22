@@ -1,6 +1,5 @@
 package com.example.makenotesapp;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -22,7 +21,7 @@ import android.widget.TextView;
  * create an instance of this fragment.
  */
 public class NoteDataFragment extends Fragment {
-
+    private static final String NOTES_LIST_TRANSACTION = "NotesListTrans";
     private static final String NOTES = "Notes";
     public static final String NOTE_DATA = "NoteData";
     private Notes mNotes;
@@ -56,6 +55,7 @@ public class NoteDataFragment extends Fragment {
             mNotes = getArguments().getParcelable(NOTES);
         }
         if (mNotes == null) {
+            //TODO: Make user data load here
             mNotes = new Notes();
             mNotes.addNote("First Note", "first description", "Very First Text written in first note");
             mNotes.addNote("Second Note", "second description", "Very Second Text written in second note");
@@ -65,12 +65,9 @@ public class NoteDataFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_note_data_output, container, false);
     }
 
-
-    // вызывается после создания макета фрагмента, здесь мы проинициализируем список
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -110,16 +107,28 @@ public class NoteDataFragment extends Fragment {
         detail.setArguments(bundle);
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.edit_notes, detail);  // замена фрагмента
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.edit_notes, detail);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
     }
 
     private void showPortNoteEditor(NoteData currentNote) {
-        Intent intent = new Intent();
-        intent.setClass(getActivity(), MainActivity2NoteText.class);
-        intent.putExtra(NOTE_DATA, currentNote);
-        startActivity(intent);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(NOTE_DATA, currentNote);
+        NoteEditorFragment detail = new NoteEditorFragment();
+        detail.setArguments(bundle);
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        //fragmentTransaction.addToBackStack(NOTES_LIST_TRANSACTION);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.replace(R.id.first_frame_layout, detail);
+        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.commit();
+//        Intent intent = new Intent();
+//        intent.setClass(getActivity(), MainActivity2NoteText.class);
+//        intent.putExtra(NOTE_DATA, currentNote);
+//        startActivity(intent);
     }
 
     private void initList(View view) {

@@ -8,4 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="noteNameText">#29037E</color>
+    <color name="nav_background_end">#00695C</color>
+    <color name="nav_center_background">#FFC107</color>
+    <color name="nav_start_background">#4DB6AC</color>
 </resources>

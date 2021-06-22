@@ -14,22 +14,25 @@ public class Notes implements Parcelable {
         notes = in.createTypedArrayList(NoteData.CREATOR);
     }
 
-    public Notes(){
+    public Notes() {
         notes = new ArrayList<>();
-    };
-
-    public void addNote(String header,String description,String text){
-        notes.add(new NoteData(header,description,text));
     }
 
-    public NoteData at(int i){
+    ;
+
+    public void addNote(String header, String description, String text) {
+        notes.add(new NoteData(header, description, text));
+    }
+
+    public NoteData at(int i) {
         return notes.get(i);
     }
 
 
-    public int getLength(){
+    public int getLength() {
         return notes.size();
     }
+
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(notes);

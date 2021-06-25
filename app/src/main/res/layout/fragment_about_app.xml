@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/futureDelete"
+        android:text="@string/welcome"
         android:textColor="@color/purple_700"
         android:textSize="@dimen/deleteInFuture" />
 

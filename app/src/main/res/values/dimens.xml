@@ -4,4 +4,7 @@
     <dimen name="nav_header_text">42sp</dimen>
     <dimen name="nav_header_height">200dp</dimen>
     <dimen name="deleteInFuture">50sp</dimen>
+    <dimen name="dataTextSize">20sp</dimen>
+    <dimen name="cardRadius">15dp</dimen>
+    <dimen name="cardElevation">10dp</dimen>
 </resources>

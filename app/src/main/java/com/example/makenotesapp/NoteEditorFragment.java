@@ -18,11 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link NoteEditorFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class NoteEditorFragment extends Fragment {
 
     private static final String NOTE_DATA = "NoteData";
@@ -30,20 +25,12 @@ public class NoteEditorFragment extends Fragment {
     private NoteData mNoteData;
 
     public NoteEditorFragment() {
-        // Required empty public constructor
     }
 
     public NoteEditorFragment(NoteData noteData) {
         mNoteData = noteData;
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param noteData Parameter 1.
-     * @return A new instance of fragment NoteEditorFragment.
-     */
     public static NoteEditorFragment newInstance(String noteData) {
         NoteEditorFragment fragment = new NoteEditorFragment();
         Bundle args = new Bundle();

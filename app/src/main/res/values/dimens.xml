@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="noteNameSize">15sp</dimen>
+    <dimen name="nav_header_text">42sp</dimen>
+    <dimen name="nav_header_height">200dp</dimen>
+    <dimen name="deleteInFuture">50sp</dimen>
 </resources>

@@ -19,15 +19,19 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
+    private Navigation mNavigation;
+    private Publisher mPublisher = new Publisher();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.first_frame_layout, new ListFragment());
-        fragmentTransaction.commit();
+        mNavigation = new Navigation(getSupportFragmentManager());
+        getNavigation().addFragment(ListFragment.newInstance(), false);
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.replace(R.id.first_frame_layout, new ListFragment());
+//        fragmentTransaction.commit();
         initView();
     }
 
@@ -61,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean navigateFragment(int id) {
         switch (id) {
             case R.id.action_settings:
-                replaceFragment(new AboutAppFragment());
+                //getNavigation().addFragment(AboutAppFragment.newInstance(), false);
+                Toast.makeText(getApplicationContext(),
+                        "Settings will open here", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_main:
                 Toast.makeText(getApplicationContext(),
@@ -75,17 +81,19 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.replace(R.id.first_frame_layout, fragment);
-        fragmentTransaction.commit();
-    }
+//    private void replaceFragment(Fragment fragment) {
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.addToBackStack(null);
+//        fragmentTransaction.replace(R.id.first_frame_layout, fragment);
+//        fragmentTransaction.commit();
+//    }
 
     private Toolbar initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
         return toolbar;
     }
 
@@ -120,4 +128,17 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
+    public Navigation getNavigation() {
+        return mNavigation;
+    }
+
+    public Publisher getPublisher() {
+        return mPublisher;
+    }
 }

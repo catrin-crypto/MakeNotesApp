@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Make Notes App</string>
     <string name="search">search</string>
-    <string name="add_note">add note</string>
+    <string name="add_note">do smth</string>
     <string name="favorite">favorite</string>
     <string name="main">main</string>
     <string name="settings">settings</string>
@@ -9,4 +9,12 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="welcome">Welcome to MakeNotesApp</string>
+    <string name="clear">clear</string>
+    <string name="add">add</string>
+    <string name="update">update</string>
+    <string name="delete">delete</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="text">Text</string>
+    <string name="date">Date</string>
 </resources>

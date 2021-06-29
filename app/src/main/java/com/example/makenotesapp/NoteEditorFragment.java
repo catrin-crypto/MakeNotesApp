@@ -21,7 +21,6 @@ import android.widget.Toast;
 public class NoteEditorFragment extends Fragment {
 
     private static final String NOTE_DATA = "NoteData";
-
     private NoteData mNoteData;
 
     public NoteEditorFragment() {
@@ -95,11 +94,10 @@ public class NoteEditorFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_add) {
-            Toast.makeText(getContext(), "Action add is out of service", Toast.LENGTH_SHORT).show();
+        if (item.getItemId() == R.id.action_settings) {
+            Toast.makeText(getContext(), "Action is out of service", Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

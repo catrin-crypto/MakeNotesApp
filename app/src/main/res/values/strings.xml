@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Make Notes App</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search">search</string>
     <string name="add_note">add note</string>
     <string name="favorite">favorite</string>
@@ -10,5 +8,5 @@
     <string name="navigation">Navigation</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="futureDelete">Welcome to MakeNotesApp</string>
+    <string name="welcome">Welcome to MakeNotesApp</string>
 </resources>

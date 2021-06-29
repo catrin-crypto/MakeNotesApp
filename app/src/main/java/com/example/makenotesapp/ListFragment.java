@@ -3,33 +3,35 @@ package com.example.makenotesapp;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-public class NoteDataFragment extends Fragment {
-    private static final String NOTES_LIST_TRANSACTION = "NotesListTrans";
-    private static final String NOTES = "Notes";
+public class ListFragment extends Fragment {
+
+    private static final String ARG_PARAM1 = "notes";
     public static final String NOTE_DATA = "NoteData";
+
     private Notes mNotes;
     private NoteData mCurrentNote;
     private boolean mIsLandscape;
 
-    public NoteDataFragment() {
+
+    public ListFragment() {
+
     }
 
-    public static NoteDataFragment newInstance(Notes notes) {
-        NoteDataFragment fragment = new NoteDataFragment();
+    public static ListFragment newInstance(Notes notes) {
+        ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
-        args.putParcelable(NOTES, notes);
+        args.putParcelable(ARG_PARAM1, notes);
         fragment.setArguments(args);
         return fragment;
     }
@@ -38,30 +40,14 @@ public class NoteDataFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mNotes = getArguments().getParcelable(NOTES);
+            mNotes = getArguments().getParcelable(ARG_PARAM1);
         }
         if (mNotes == null) {
+
             mNotes = new Notes();
             mNotes.addNote("First Note", "first description", "Very First Text written in first note");
             mNotes.addNote("Second Note", "second description", "Very Second Text written in second note");
         }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_note_data_output, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        initList(view);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
         mIsLandscape = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
 
@@ -74,6 +60,36 @@ public class NoteDataFragment extends Fragment {
         if (mIsLandscape) {
             showLandNoteEditor(mCurrentNote);
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_lines);
+
+        initRecyclerView(recyclerView);
+        return view;
+
+    }
+
+    private void initRecyclerView(RecyclerView recyclerView) {
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+        NotesDataAdapter adapter = new NotesDataAdapter(mNotes);
+        recyclerView.setAdapter(adapter);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
+        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.separator, null));
+        recyclerView.addItemDecoration(itemDecoration);
+        adapter.SetOnItemClickListener(new NotesDataAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                mCurrentNote = mNotes.at(position);
+                showNoteEditor(mCurrentNote);
+            }
+        });
     }
 
     private void showNoteEditor(NoteData currentNote) {
@@ -109,39 +125,7 @@ public class NoteDataFragment extends Fragment {
         fragmentTransaction.replace(R.id.first_frame_layout, detail);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
-    }
 
-    private void initList(View view) {
-        LinearLayout commonLayout = view.findViewById(R.id.commonLayout);
-        for (int i = 0; i < mNotes.getLength(); i++) {
-            NoteData note = mNotes.at(i);
-
-            LinearLayout layoutView = new LinearLayout(view.getContext());
-
-            layoutView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCurrentNote = note;
-                    showNoteEditor(note);
-                }
-            });
-
-            layoutView.setOrientation(LinearLayout.HORIZONTAL);
-            commonLayout.addView(layoutView);
-            TextView tvHeader = new TextView(getContext());
-            tvHeader.setText(note.getHeader());
-            tvHeader.setTextSize(15);
-            layoutView.addView(tvHeader);
-            TextView tvDescription = new TextView(getContext());
-            tvDescription.setText(note.getDescription());
-            tvDescription.setTextSize(15);
-            layoutView.addView(tvDescription);
-            TextView tvDate = new TextView(getContext());
-            tvDate.setText(note.getCreationDate().toString());
-            tvDate.setTextSize(15);
-            layoutView.addView(tvDate);
-
-        }
     }
 
 }

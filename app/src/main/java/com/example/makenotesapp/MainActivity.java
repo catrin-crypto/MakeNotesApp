@@ -26,8 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.first_frame_layout, new NoteDataFragment());
-        //fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+        fragmentTransaction.replace(R.id.first_frame_layout, new ListFragment());
         fragmentTransaction.commit();
         initView();
     }
@@ -63,16 +62,12 @@ public class MainActivity extends AppCompatActivity {
         switch (id) {
             case R.id.action_settings:
                 replaceFragment(new AboutAppFragment());
-//              Toast.makeText(getApplicationContext(),
-//                        "Settings fragment", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_main:
-                //addFragment(new MainFragment());
                 Toast.makeText(getApplicationContext(),
                         "Main fragment will open here", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.action_favorite:
-                //addFragment(new FavoriteFragment());
                 Toast.makeText(getApplicationContext(),
                         "Favourites fragment will be here", Toast.LENGTH_SHORT).show();
                 return true;

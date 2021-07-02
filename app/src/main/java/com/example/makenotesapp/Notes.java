@@ -18,7 +18,9 @@ public class Notes implements Parcelable {
         notes = new ArrayList<>();
     }
 
-    ;
+    public void addNote(NoteData noteData) {
+        notes.add(noteData);
+    }
 
     public void addNote(String header, String description, String text) {
         notes.add(new NoteData(header, description, text));
@@ -54,4 +56,17 @@ public class Notes implements Parcelable {
             return new Notes[size];
         }
     };
+
+
+    public void updateNoteData(int position, NoteData noteData) {
+        notes.set(position, noteData);
+    }
+
+    public void deleteNoteData(int position) {
+        notes.remove(position);
+    }
+
+    public void clearNoteData() {
+        notes.clear();
+    }
 }

@@ -1,4 +1,4 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class NoteData implements Parcelable {
+
+    private String id;
     private String header;
     private String description;
     private Date creationDate;
@@ -76,6 +78,14 @@ public class NoteData implements Parcelable {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override

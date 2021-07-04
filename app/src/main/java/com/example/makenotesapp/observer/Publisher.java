@@ -1,4 +1,6 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.observer;
+
+import com.example.makenotesapp.data.NoteData;
 
 import java.util.ArrayList;
 import java.util.List;

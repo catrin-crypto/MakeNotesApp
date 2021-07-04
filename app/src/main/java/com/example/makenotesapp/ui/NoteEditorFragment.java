@@ -1,4 +1,4 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.ui;
 
 import android.os.Bundle;
 
@@ -13,10 +13,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.makenotesapp.data.NoteData;
+import com.example.makenotesapp.R;
 
 public class NoteEditorFragment extends Fragment {
 

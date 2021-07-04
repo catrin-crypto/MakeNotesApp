@@ -1,4 +1,4 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.ui;
 
 
 import android.os.Build;
@@ -12,11 +12,16 @@ import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.makenotesapp.data.INotes;
+import com.example.makenotesapp.data.NoteData;
+import com.example.makenotesapp.data.Notes;
+import com.example.makenotesapp.R;
+
 import java.text.SimpleDateFormat;
 
 public class NotesDataAdapter
         extends RecyclerView.Adapter<NotesDataAdapter.ViewHolder> {
-    private Notes notesSource;
+    private INotes notesSource;
     private OnItemClickListener itemClickListener;
     private final Fragment mFragment;
     private int mMenuPosition;
@@ -25,10 +30,15 @@ public class NotesDataAdapter
         return mMenuPosition;
     }
 
-    public NotesDataAdapter(Notes notesSource, Fragment fragment) {
-        this.notesSource = notesSource;
+    public NotesDataAdapter(Fragment fragment) {
         this.mFragment = fragment;
     }
+
+    public void setDataSource(INotes dataSource){
+        this.notesSource = dataSource;
+        notifyDataSetChanged();
+    }
+
 
     @NonNull
     @Override

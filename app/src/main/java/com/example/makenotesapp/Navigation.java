@@ -11,12 +11,13 @@ public class Navigation {
         this.fragmentManager = fragmentManager;
     }
 
-    public void addFragment(Fragment fragment, boolean useBackStack) {
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.first_frame_layout, fragment);
-        if (useBackStack) {
-            fragmentTransaction.addToBackStack(null);
-        }
-        fragmentTransaction.commit();
+    public void addFragmentToFirstFrame(Fragment fragment, boolean useBackStack, String tag) {
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            fragmentTransaction.replace(R.id.first_frame_layout, fragment, tag);
+            if (useBackStack) {
+                fragmentTransaction.addToBackStack(null);
+            }
+            fragmentTransaction.commit();
     }
 }

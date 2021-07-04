@@ -1,4 +1,4 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.ui;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -16,33 +16,46 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
+import com.example.makenotesapp.MainActivity;
+import com.example.makenotesapp.Navigation;
+import com.example.makenotesapp.data.INotes;
+import com.example.makenotesapp.data.NoteData;
+import com.example.makenotesapp.data.Notes;
+import com.example.makenotesapp.data.NotesFirebase;
+import com.example.makenotesapp.data.NotesFirebaseResponse;
+import com.example.makenotesapp.observer.Observer;
+import com.example.makenotesapp.observer.Publisher;
+import com.example.makenotesapp.R;
 
 public class ListFragment extends Fragment {
     private static final int MY_DEFAULT_DURATION = 1000;
     private static final String ARG_PARAM1 = "notes";
     public static final String NOTE_DATA = "NoteData";
-    private Notes mNotes;
+    public static final String TAG = "ListFragment";
+    private INotes mNotes;
     private NoteData mCurrentNote;
     private boolean mIsLandscape;
     private NotesDataAdapter mAdapter;
-    private RecyclerView mRecyclerView;
     private Navigation mNavigation;
     private Publisher mPublisher;
-    private boolean mMoveToLastPosition;
+    private boolean mMoveToFirstPosition;
 
     public ListFragment() {
 
     }
 
-    public static ListFragment newInstance() {
-        ListFragment fragment = new ListFragment();
-        Bundle args = new Bundle();
+    public static ListFragment getInstance(FragmentManager fragmentManager,Bundle args) {
+        Fragment fr = fragmentManager.findFragmentByTag(TAG);
+        ListFragment fragment;
+        if (fr == null){
+            fragment = new ListFragment();
+        } else fragment = (ListFragment) fr;
+        if (args == null) args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
@@ -54,22 +67,28 @@ public class ListFragment extends Fragment {
             mNotes = getArguments().getParcelable(ARG_PARAM1);
         }
         if (mNotes == null) {
-
-            mNotes = new Notes();
-            mNotes.addNote("First Note", "first description", "Very First Text written in first note");
-            mNotes.addNote("Second Note", "second description", "Very Second Text written in second note");
+            if (savedInstanceState != null) {
+                mNotes = savedInstanceState.getParcelable(ARG_PARAM1);
+            }
         }
-        mIsLandscape = getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
+        if (mNotes == null) {
+            mNotes = new Notes();
+            mNotes.addNoteData(
+                    new NoteData("First Note",
+                            "first description",
+                            "Very First Text written in first note"));
+            mNotes.addNoteData(
+                    new NoteData("Second Note",
+                            "second description",
+                            "Very Second Text written in second note"));
+        }
 
         if (savedInstanceState != null) {
             mCurrentNote = savedInstanceState.getParcelable(NOTE_DATA);
-        } else {
-            mCurrentNote = mNotes.at(0);
         }
 
-        if (mIsLandscape) {
-            showLandNoteEditor(0);
+        if (mCurrentNote == null){
+            mCurrentNote = mNotes.at(0);
         }
     }
 
@@ -78,9 +97,22 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_lines);
+        mIsLandscape = getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
 
+        if (mIsLandscape) {
+            showLandNoteEditor(0);
+        }
         initRecyclerView(recyclerView);
         setHasOptionsMenu(true);
+        mNotes = new NotesFirebase().init(new NotesFirebaseResponse() {
+            @Override
+            public void initialized(INotes notesData) {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+        mAdapter.setDataSource(mNotes);
+
         return view;
 
     }
@@ -99,48 +131,18 @@ public class ListFragment extends Fragment {
         mPublisher = null;
         super.onDetach();
     }
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.main, menu);
-//    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_add:
-//                mNotes.addNote("Заголовок ",
-//                        "Описание ","Текст ");
-//                mAdapter.notifyItemInserted(mNotes.getLength() - 1);
-//                mRecyclerView.smoothScrollToPosition(mNotes.getLength() - 1);
-                mNavigation.addFragment(EditorFragment.newInstance(), true);
-                mPublisher.subscribe(new Observer() {
-                    @Override
-                    public void updateNoteData(NoteData noteData) {
-                        mNotes.addNote(noteData);
-                        mAdapter.notifyItemInserted(mNotes.getLength() - 1);
-                        mMoveToLastPosition = true;
-                    }
-                });
-                return true;
-            case R.id.action_clear:
-                mNotes.clearNoteData();
-                mAdapter.notifyDataSetChanged();
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return onItemSelected(item.getItemId()) || super.onOptionsItemSelected(item);
     }
 
-    private void initView(View view) {
-        mRecyclerView = view.findViewById(R.id.recycler_view_lines);
-        //mNotes = new Notes(getResources()).init();
-        initRecyclerView(mRecyclerView);
-    }
 
     private void initRecyclerView(RecyclerView recyclerView) {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new NotesDataAdapter(mNotes,this);
+        mAdapter = new NotesDataAdapter(this);
         recyclerView.setAdapter(mAdapter);
 
         DividerItemDecoration itemDecoration = new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL);
@@ -152,9 +154,9 @@ public class ListFragment extends Fragment {
         animator.setRemoveDuration(MY_DEFAULT_DURATION);
         recyclerView.setItemAnimator(animator);
 
-        if (mMoveToLastPosition){
-            recyclerView.smoothScrollToPosition(mNotes.getLength() - 1);
-            mMoveToLastPosition = false;
+        if (mMoveToFirstPosition && mNotes.getLength() > 0){
+            recyclerView.scrollToPosition(0);
+            mMoveToFirstPosition = false;
         }
 
         mAdapter.SetOnItemClickListener(new NotesDataAdapter.OnItemClickListener() {
@@ -162,6 +164,13 @@ public class ListFragment extends Fragment {
             public void onItemClick(View view, int position) {
                 mCurrentNote = mNotes.at(position);
                 showNoteEditor(position);
+                mPublisher.subscribe(new Observer() {
+                    @Override
+                    public void updateNoteData(NoteData noteData) {
+                        mNotes.updateNoteData(position, noteData);
+                        mAdapter.notifyItemChanged(position);
+                    }
+                });
             }
         });
     }
@@ -176,45 +185,26 @@ public class ListFragment extends Fragment {
 
     private void showLandNoteEditor(int position) {
 
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(NOTE_DATA, mNotes.at(position));
-        EditorFragment detail = new EditorFragment();
-        detail.setArguments(bundle);
+        NoteData noteData = null;
+        if (position > -1)
+           noteData = mNotes.at(position);
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        EditorFragment editorFragment = EditorFragment.getInstance(fragmentManager,noteData);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.replace(R.id.edit_notes, detail);
+        fragmentTransaction.replace(R.id.edit_notes, editorFragment);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
         fragmentTransaction.commit();
-        mPublisher.subscribe(new Observer() {
-            @Override
-            public void updateNoteData(NoteData noteData) {
-                mNotes.updateNoteData(position, noteData);
-                mAdapter.notifyItemChanged(position);
-            }
-        });
     }
 
     private void showPortNoteEditor(int position) {
-        mNavigation.addFragment(EditorFragment.newInstance(mNotes.at(position)), true);
-        mPublisher.subscribe(new Observer() {
-            @Override
-            public void updateNoteData(NoteData noteData) {
-                mNotes.updateNoteData(position, noteData);
-                mAdapter.notifyItemChanged(position);
-            }
-        });
-//        Bundle bundle = new Bundle();
-//        bundle.putParcelable(NOTE_DATA, mNotes.at(position));
-//        EditorFragment detail = new EditorFragment();
-//        detail.setArguments(bundle);
-//        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.addToBackStack(null);
-//        fragmentTransaction.replace(R.id.first_frame_layout, detail);
-//        fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-//        fragmentTransaction.commit();
-
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        NoteData noteData = null;
+        if (position > -1)
+            noteData = mNotes.at(position);
+        mNavigation.addFragmentToFirstFrame(
+                EditorFragment.getInstance(fragmentManager,noteData),
+                true,EditorFragment.TAG);
     }
 
     @Override
@@ -226,31 +216,52 @@ public class ListFragment extends Fragment {
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-        int position = mAdapter.getMenuPosition();
+        return onItemSelected(item.getItemId()) || super.onContextItemSelected(item);
+    }
 
-        switch(item.getItemId()) {
-            case R.id.action_update:
-                Toast.makeText(this.getContext(),
-                        "Update", Toast.LENGTH_SHORT).show();
-                mNavigation.addFragment(EditorFragment.newInstance(mNotes.at(position)), true);
+    private boolean onItemSelected(int menuItemId){
+        switch (menuItemId){
+            case R.id.action_add:
+                showNoteEditor(-1);
                 mPublisher.subscribe(new Observer() {
                     @Override
                     public void updateNoteData(NoteData noteData) {
-                        mNotes.updateNoteData(position, noteData);
-                        mAdapter.notifyItemChanged(position);
+                        mNotes.addNoteData(noteData);
+                        mAdapter.notifyItemInserted(mNotes.getLength() - 1);
+                        mMoveToFirstPosition = true;
                     }
                 });
-
+                return true;
+            case R.id.action_update:
+                final int updatePosition = mAdapter.getMenuPosition();
+                showNoteEditor(updatePosition);
+                mPublisher.subscribe(new Observer() {
+                    @Override
+                    public void updateNoteData(NoteData noteData) {
+                        mNotes.updateNoteData(updatePosition, noteData);
+                        mAdapter.notifyItemChanged(updatePosition);
+                    }
+                });
                 return true;
             case R.id.action_delete:
-                mNotes.deleteNoteData(position);
-                mAdapter.notifyItemRemoved(position);
-
-                Toast.makeText(this.getContext(),
-                        "Delete", Toast.LENGTH_SHORT).show();
+                int deletePosition = mAdapter.getMenuPosition();
+                mNotes.deleteNoteData(deletePosition);
+                mAdapter.notifyItemRemoved(deletePosition);
+                return true;
+            case R.id.action_clear:
+                mNotes.clearNoteData();
+                mAdapter.notifyDataSetChanged();
                 return true;
         }
-        return super.onContextItemSelected(item);
+        return false;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        Notes notes = new Notes();
+        notes.replaceNotesData(mNotes.getNotesList());
+        savedInstanceState.putParcelable(ARG_PARAM1,notes);
     }
 
 }

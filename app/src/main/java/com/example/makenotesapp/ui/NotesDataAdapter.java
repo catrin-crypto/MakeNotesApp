@@ -6,17 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.makenotesapp.data.INotes;
 import com.example.makenotesapp.data.NoteData;
-import com.example.makenotesapp.data.Notes;
 import com.example.makenotesapp.R;
-
 import java.text.SimpleDateFormat;
 
 public class NotesDataAdapter

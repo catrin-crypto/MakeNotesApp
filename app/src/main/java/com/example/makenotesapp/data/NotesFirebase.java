@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class NotesFirebase implements  INotes {
+public class NotesFirebase implements INotes {
     private static final String NOTES_COLLECTION = "notes";
     private static final String TAG = "[NotesSource]";
 
@@ -75,6 +75,7 @@ public class NotesFirebase implements  INotes {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 noteData.setId(documentReference.getId());
+                mNotesData.add(noteData);
             }
         });
     }
@@ -82,13 +83,23 @@ public class NotesFirebase implements  INotes {
     @Override
     public void updateNoteData(int position, NoteData noteData) {
         String id = noteData.getId();
-         mCollection.document(id).set(NotesDataMapping.toDocument(noteData));
+         mCollection.document(id).set(NotesDataMapping.toDocument(noteData)).addOnSuccessListener(new OnSuccessListener<Void>() {
+             @Override
+             public void onSuccess(Void aVoid) {
+                 mNotesData.set(position, noteData);
+             }
+         });
     }
 
     @Override
     public void deleteNoteData(int position) {
-        mCollection.document(mNotesData.get(position).getId()).delete();
-        mNotesData.remove(position);
+        mCollection.document(mNotesData.get(position).getId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                mNotesData.remove(position);
+            }
+        });
+
     }
 
     @Override

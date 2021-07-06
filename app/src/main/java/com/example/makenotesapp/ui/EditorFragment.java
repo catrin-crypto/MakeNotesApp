@@ -70,6 +70,7 @@ public class EditorFragment extends Fragment {
 
     @Override
     public void onDetach() {
+        publisher.disactivate();
         publisher = null;
         super.onDetach();
     }
@@ -88,13 +89,21 @@ public class EditorFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
         mNoteData = collectNoteData();
+        if (mNoteData.getId() != "") {
+            publisher.notifySingle(mNoteData);
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        publisher.notifySingle(mNoteData);
     }
 
     private NoteData collectNoteData() {

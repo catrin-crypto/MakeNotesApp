@@ -16,14 +16,13 @@ public class Publisher {
         observers.add(observer);
     }
 
-    public void unsubscribe(Observer observer) {
-        observers.remove(observer);
+    public void disactivate(){
+        observers.clear();
     }
 
     public void notifySingle(NoteData noteData) {
         for (Observer observer : observers) {
             observer.updateNoteData(noteData);
-            unsubscribe(observer);
         }
     }
 

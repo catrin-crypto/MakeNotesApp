@@ -1,16 +1,21 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.ui;
 
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 
+import com.example.makenotesapp.MainActivity;
+import com.example.makenotesapp.data.NoteData;
+import com.example.makenotesapp.observer.Publisher;
+import com.example.makenotesapp.R;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Calendar;
@@ -18,7 +23,8 @@ import java.util.Date;
 
 public class EditorFragment extends Fragment {
 
-    private static final String ARG_NOTE_DATA = "NoteData";
+    public static final String TAG = "EditorFragment";
+    public static final String ARG_NOTE_DATA = "NoteData";
     private NoteData mNoteData;
     private Publisher publisher;
     private TextInputEditText title;
@@ -26,15 +32,23 @@ public class EditorFragment extends Fragment {
     private TextInputEditText text;
     private DatePicker datePicker;
 
-    public static EditorFragment newInstance(NoteData noteData) {
-        EditorFragment fragment = new EditorFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(ARG_NOTE_DATA, noteData);
-        fragment.setArguments(args);
+    public static EditorFragment getInstance(FragmentManager fragmentManager,NoteData noteData) {
+        Fragment fr = fragmentManager.findFragmentByTag(TAG);
+        EditorFragment fragment;
+        if (fr == null){
+            fragment = new EditorFragment();
+            Bundle args = new Bundle();
+            args.putParcelable(ARG_NOTE_DATA, noteData);
+            fragment.setArguments(args);
+
+        } else {
+            fragment = (EditorFragment) fr;
+            fragment.setData(noteData);
+        }
         return fragment;
     }
 
-    public static EditorFragment newInstance() {
+    public static EditorFragment getInstance() {
         EditorFragment fragment = new EditorFragment();
         return fragment;
     }
@@ -74,7 +88,7 @@ public class EditorFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
-        mNoteData = collectCardData();
+        mNoteData = collectNoteData();
     }
 
     @Override
@@ -83,13 +97,19 @@ public class EditorFragment extends Fragment {
         publisher.notifySingle(mNoteData);
     }
 
-    private NoteData collectCardData() {
+    private NoteData collectNoteData() {
         String title = this.title.getText().toString();
         String description = this.description.getText().toString();
         String text = this.text.getText().toString();
         Date date = getDateFromDatePicker();
-
-        return new NoteData(title, description, date, text);
+        NoteData answer;
+        if (mNoteData != null){
+            answer = new NoteData(title,description,date,text);
+            answer.setId(mNoteData.getId());
+            return answer;
+        }else {
+            return new NoteData(title, description, date, text);
+        }
     }
 
     private Date getDateFromDatePicker() {
@@ -121,5 +141,9 @@ public class EditorFragment extends Fragment {
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH),
                 null);
+    }
+
+    public void setData(NoteData noteData){
+        mNoteData = noteData;
     }
 }

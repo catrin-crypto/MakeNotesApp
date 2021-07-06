@@ -8,14 +8,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.makenotesapp.observer.Publisher;
+import com.example.makenotesapp.ui.ListFragment;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
@@ -25,13 +25,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-        mNavigation = new Navigation(getSupportFragmentManager());
-        getNavigation().addFragment(ListFragment.newInstance(), false);
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.replace(R.id.first_frame_layout, new ListFragment());
-//        fragmentTransaction.commit();
+
+        getNavigation().addFragmentToFirstFrame(ListFragment.getInstance(getSupportFragmentManager()
+                ,savedInstanceState), false,ListFragment.TAG);
         initView();
     }
 
@@ -65,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean navigateFragment(int id) {
         switch (id) {
             case R.id.action_settings:
-                //getNavigation().addFragment(AboutAppFragment.newInstance(), false);
                 Toast.makeText(getApplicationContext(),
                         "Settings will open here", Toast.LENGTH_SHORT).show();
                 return true;
@@ -81,13 +78,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-//    private void replaceFragment(Fragment fragment) {
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.addToBackStack(null);
-//        fragmentTransaction.replace(R.id.first_frame_layout, fragment);
-//        fragmentTransaction.commit();
-//    }
 
     private Toolbar initToolbar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -135,10 +125,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public Navigation getNavigation() {
+        if (mNavigation == null)
+            mNavigation = new Navigation(getSupportFragmentManager());
         return mNavigation;
     }
 
     public Publisher getPublisher() {
         return mPublisher;
     }
+
+    @Override
+    public void onPause(){
+        System.out.println("Saving webview state");
+
+        super.onPause();
+
+    }
+
+
 }

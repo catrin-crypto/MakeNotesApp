@@ -1,4 +1,4 @@
-package com.example.makenotesapp;
+package com.example.makenotesapp.ui;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -14,6 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.makenotesapp.data.NoteData;
+import com.example.makenotesapp.data.Notes;
+import com.example.makenotesapp.R;
 
 public class NoteDataFragment extends Fragment {
     private static final String NOTES_LIST_TRANSACTION = "NotesListTrans";
@@ -42,8 +46,8 @@ public class NoteDataFragment extends Fragment {
         }
         if (mNotes == null) {
             mNotes = new Notes();
-            mNotes.addNote("First Note", "first description", "Very First Text written in first note");
-            mNotes.addNote("Second Note", "second description", "Very Second Text written in second note");
+            mNotes.addNoteData("First Note", "first description", "Very First Text written in first note");
+            mNotes.addNoteData("Second Note", "second description", "Very Second Text written in second note");
         }
     }
 

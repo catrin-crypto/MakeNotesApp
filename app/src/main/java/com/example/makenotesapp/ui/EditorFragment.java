@@ -96,9 +96,8 @@ public class EditorFragment extends Fragment {
     public void onPause(){
         super.onPause();
         mNoteData = collectNoteData();
-        if (mNoteData.getId() != "") {
-            publisher.notifySingle(mNoteData);
-        }
+        publisher.notifySingle(mNoteData);
+
     }
 
     @Override

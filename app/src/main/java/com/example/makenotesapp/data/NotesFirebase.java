@@ -75,31 +75,23 @@ public class NotesFirebase implements INotes {
             @Override
             public void onSuccess(DocumentReference documentReference) {
                 noteData.setId(documentReference.getId());
-                mNotesData.add(noteData);
-            }
+             }
         });
+        mNotesData.add(noteData);
+
     }
 
     @Override
     public void updateNoteData(int position, NoteData noteData) {
         String id = noteData.getId();
-         mCollection.document(id).set(NotesDataMapping.toDocument(noteData)).addOnSuccessListener(new OnSuccessListener<Void>() {
-             @Override
-             public void onSuccess(Void aVoid) {
-                 mNotesData.set(position, noteData);
-             }
-         });
+         if (mCollection.document(id).set(NotesDataMapping.toDocument(noteData)).isSuccessful())
+            mNotesData.set(position, noteData);
     }
 
     @Override
     public void deleteNoteData(int position) {
-        mCollection.document(mNotesData.get(position).getId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                mNotesData.remove(position);
-            }
-        });
-
+        if (mCollection.document(mNotesData.get(position).getId()).delete().isSuccessful())
+            mNotesData.remove(position);
     }
 
     @Override

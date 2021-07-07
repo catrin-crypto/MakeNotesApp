@@ -188,7 +188,7 @@ public class ListFragment extends Fragment {
         return onItemSelected(item.getItemId()) || super.onContextItemSelected(item);
     }
 
-    private boolean onItemSelected(int menuItemId) {
+    public boolean onItemSelected(int menuItemId) {
         switch (menuItemId) {
             case R.id.action_add:
                 showNoteEditor(-1);

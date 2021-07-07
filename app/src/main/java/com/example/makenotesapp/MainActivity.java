@@ -52,13 +52,16 @@ public class MainActivity extends AppCompatActivity {
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                Toast.makeText(MainActivity.this, "Кнопка нажата", Toast.LENGTH_SHORT).show();
+                                ListFragment fr = mNavigation.getListFragment();
+                                if (fr != null){
+                                    fr.onItemSelected(R.id.action_clear);
+                                }
                             }
                         })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        Toast.makeText(MainActivity.this, "Кнопка нажата", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Кнопка NO нажата", Toast.LENGTH_SHORT).show();
                     }
                 });
 

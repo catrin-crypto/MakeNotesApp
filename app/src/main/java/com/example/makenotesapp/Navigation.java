@@ -1,10 +1,14 @@
 package com.example.makenotesapp;
 
+import android.provider.Contacts;
 import android.util.Log;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+
+import com.example.makenotesapp.ui.ListFragment;
 
 public class Navigation {
     private final FragmentManager fragmentManager;
@@ -16,6 +20,8 @@ public class Navigation {
     public int getBackStackEntryCount() {
         return fragmentManager.getBackStackEntryCount();
     }
+
+    public com.example.makenotesapp.ui.ListFragment getListFragment(){ return (ListFragment) fragmentManager.findFragmentByTag(ListFragment.TAG);}
 
     public void popBackStack() {
         fragmentManager.popBackStack();

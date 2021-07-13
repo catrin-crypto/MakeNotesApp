@@ -17,4 +17,8 @@
     <string name="description">Description</string>
     <string name="text">Text</string>
     <string name="date">Date</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="alert_before_delete">Are you sure you want to delete all notes?</string>
+    <string name="dialog_title">Warning</string>
 </resources>

@@ -25,7 +25,6 @@ import com.example.makenotesapp.MainActivity;
 import com.example.makenotesapp.Navigation;
 import com.example.makenotesapp.data.INotes;
 import com.example.makenotesapp.data.NoteData;
-import com.example.makenotesapp.data.Notes;
 import com.example.makenotesapp.data.NotesFirebase;
 import com.example.makenotesapp.data.NotesFirebaseResponse;
 import com.example.makenotesapp.observer.Observer;
@@ -34,11 +33,8 @@ import com.example.makenotesapp.R;
 
 public class ListFragment extends Fragment {
     private static final int MY_DEFAULT_DURATION = 1000;
-    private static final String ARG_PARAM1 = "notes";
-    public static final String NOTE_DATA = "NoteData";
     public static final String TAG = "ListFragment";
     private INotes mNotes;
-    private NoteData mCurrentNote;
     private boolean mIsLandscape;
     private NotesDataAdapter mAdapter;
     private Navigation mNavigation;
@@ -49,10 +45,10 @@ public class ListFragment extends Fragment {
 
     }
 
-    public static ListFragment getInstance(FragmentManager fragmentManager,Bundle args) {
+    public static ListFragment getInstance(FragmentManager fragmentManager, Bundle args) {
         Fragment fr = fragmentManager.findFragmentByTag(TAG);
         ListFragment fragment;
-        if (fr == null){
+        if (fr == null) {
             fragment = new ListFragment();
         } else fragment = (ListFragment) fr;
         if (args == null) args = new Bundle();
@@ -63,33 +59,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mNotes = getArguments().getParcelable(ARG_PARAM1);
-        }
-        if (mNotes == null) {
-            if (savedInstanceState != null) {
-                mNotes = savedInstanceState.getParcelable(ARG_PARAM1);
-            }
-        }
-        if (mNotes == null) {
-            mNotes = new Notes();
-            mNotes.addNoteData(
-                    new NoteData("First Note",
-                            "first description",
-                            "Very First Text written in first note"));
-            mNotes.addNoteData(
-                    new NoteData("Second Note",
-                            "second description",
-                            "Very Second Text written in second note"));
-        }
 
-        if (savedInstanceState != null) {
-            mCurrentNote = savedInstanceState.getParcelable(NOTE_DATA);
-        }
-
-        if (mCurrentNote == null){
-            mCurrentNote = mNotes.at(0);
-        }
     }
 
     @Override
@@ -100,9 +70,7 @@ public class ListFragment extends Fragment {
         mIsLandscape = getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
 
-        if (mIsLandscape) {
-            showLandNoteEditor(0);
-        }
+
         initRecyclerView(recyclerView);
         setHasOptionsMenu(true);
         mNotes = new NotesFirebase().init(new NotesFirebaseResponse() {
@@ -120,7 +88,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        MainActivity activity = (MainActivity)context;
+        MainActivity activity = (MainActivity) context;
         mNavigation = activity.getNavigation();
         mPublisher = activity.getPublisher();
     }
@@ -128,6 +96,7 @@ public class ListFragment extends Fragment {
     @Override
     public void onDetach() {
         mNavigation = null;
+        mPublisher.disactivate();
         mPublisher = null;
         super.onDetach();
     }
@@ -154,7 +123,7 @@ public class ListFragment extends Fragment {
         animator.setRemoveDuration(MY_DEFAULT_DURATION);
         recyclerView.setItemAnimator(animator);
 
-        if (mMoveToFirstPosition && mNotes.getLength() > 0){
+        if (mMoveToFirstPosition && mNotes.getLength() > 0) {
             recyclerView.scrollToPosition(0);
             mMoveToFirstPosition = false;
         }
@@ -162,12 +131,12 @@ public class ListFragment extends Fragment {
         mAdapter.SetOnItemClickListener(new NotesDataAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                mCurrentNote = mNotes.at(position);
                 showNoteEditor(position);
                 mPublisher.subscribe(new Observer() {
                     @Override
                     public void updateNoteData(NoteData noteData) {
                         mNotes.updateNoteData(position, noteData);
+                        recyclerView.getRecycledViewPool().clear();
                         mAdapter.notifyItemChanged(position);
                     }
                 });
@@ -186,10 +155,10 @@ public class ListFragment extends Fragment {
     private void showLandNoteEditor(int position) {
 
         NoteData noteData = null;
-        if (position > -1)
-           noteData = mNotes.at(position);
+        if (position > -1 && mNotes.getLength() > 0)
+            noteData = mNotes.at(position);
         FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        EditorFragment editorFragment = EditorFragment.getInstance(fragmentManager,noteData);
+        EditorFragment editorFragment = EditorFragment.getInstance(fragmentManager, noteData);
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.replace(R.id.edit_notes, editorFragment);
@@ -203,8 +172,8 @@ public class ListFragment extends Fragment {
         if (position > -1)
             noteData = mNotes.at(position);
         mNavigation.addFragmentToFirstFrame(
-                EditorFragment.getInstance(fragmentManager,noteData),
-                true,EditorFragment.TAG);
+                EditorFragment.getInstance(fragmentManager, noteData),
+                true, EditorFragment.TAG, true);
     }
 
     @Override
@@ -219,8 +188,8 @@ public class ListFragment extends Fragment {
         return onItemSelected(item.getItemId()) || super.onContextItemSelected(item);
     }
 
-    private boolean onItemSelected(int menuItemId){
-        switch (menuItemId){
+    public boolean onItemSelected(int menuItemId) {
+        switch (menuItemId) {
             case R.id.action_add:
                 showNoteEditor(-1);
                 mPublisher.subscribe(new Observer() {
@@ -258,10 +227,7 @@ public class ListFragment extends Fragment {
 
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
-        Notes notes = new Notes();
-        notes.replaceNotesData(mNotes.getNotesList());
-        savedInstanceState.putParcelable(ARG_PARAM1,notes);
+    public void onSaveInstanceState(Bundle savedInstanceState) {
     }
 
 }

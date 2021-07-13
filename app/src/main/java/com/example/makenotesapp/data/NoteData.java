@@ -15,6 +15,7 @@ public class NoteData implements Parcelable {
     private String text;
 
     public NoteData(String header, String description, String text) {
+        this.id = "";
         this.header = header;
         this.description = description;
         this.creationDate = Calendar.getInstance().getTime();
@@ -22,6 +23,7 @@ public class NoteData implements Parcelable {
     }
 
     public NoteData(String header, String description, Date creationDate, String text) {
+        this.id = "";
         this.header = header;
         this.description = description;
         this.creationDate = creationDate;
@@ -29,6 +31,7 @@ public class NoteData implements Parcelable {
     }
 
     protected NoteData(Parcel in) {
+        id = "";
         header = in.readString();
         description = in.readString();
         creationDate = new Date(in.readLong());

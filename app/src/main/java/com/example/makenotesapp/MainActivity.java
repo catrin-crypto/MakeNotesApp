@@ -2,18 +2,22 @@ package com.example.makenotesapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.makenotesapp.data.NoteData;
 import com.example.makenotesapp.observer.Publisher;
 import com.example.makenotesapp.ui.ListFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -28,10 +32,42 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        getNavigation().addFragmentToFirstFrame(ListFragment.getInstance(getSupportFragmentManager()
-                ,savedInstanceState), false,ListFragment.TAG);
+        if (savedInstanceState == null) {
+            getNavigation().addFragmentToFirstFrame(ListFragment.getInstance(getSupportFragmentManager()
+                    , savedInstanceState), false, ListFragment.TAG, false);
+        }
+
+        Button alertDialog = findViewById(R.id.clear_all);
+        alertDialog.setOnClickListener(clickAlertBeforeClear);
         initView();
     }
+
+    private View.OnClickListener clickAlertBeforeClear = view -> {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle(R.string.dialog_title)
+                .setMessage(R.string.alert_before_delete)
+                .setIcon(R.mipmap.ic_launcher_round)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                ListFragment fr = mNavigation.getListFragment();
+                                if (fr != null){
+                                    fr.onItemSelected(R.id.action_clear);
+                                }
+                            }
+                        })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        Toast.makeText(MainActivity.this, "Кнопка NO нажата", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    };
 
     private void initView() {
         initDrawer(initToolbar());
@@ -58,6 +94,16 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (mNavigation.getBackStackEntryCount() > 0) {
+            mNavigation.popBackStack();
+        } else {
+            //super.onBackPressed();
+        }
     }
 
     private boolean navigateFragment(int id) {
@@ -135,12 +181,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause(){
+    public void onPause() {
         System.out.println("Saving webview state");
 
         super.onPause();
 
     }
-
 
 }
